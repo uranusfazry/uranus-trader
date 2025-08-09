@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dasbor Trader Kripto - Edisi Cyberpunk 3D</title>
+
+    <!-- Skrip & Pustaka -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Font untuk Dasbor -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Font untuk Watermark -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================================== */
+        /* ==   VARIABEL TEMA & GAYA DASAR  == */
+        /* ================================== */
+        :root {
+            /* Tema Terang (Default) */
+            --bg-primary: #f4f7f9;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e9ecef;
+            --bg-overlay: rgba(33, 37, 41, 0.5);
+            --bg-table-header: #f8f9fa;
+            --bg-table-row-even: #f8f9fa;
+            --bg-table-row-hover: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --text-placeholder: #9ca3af;
+            --accent-pink: #d63384;
+            --accent-blue: #0d6efd;
+            --accent-green: #198754;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --input-bg: #ffffff;
+            --grid-color: rgba(0, 0, 0, 0.05);
+            --shadow-color-blue: rgba(13, 110, 253, 0.25);
+            --shadow-color-pink: rgba(214, 51, 132, 0.25);
+            --shadow-color-green: rgba(25, 135, 84, 0.25);
+            --highlight-success-bg: rgba(25, 135, 84, 0.1);
+            --highlight-warning-bg: rgba(255, 193, 7, 0.15);
+        }
+
+        html.dark {
+            /* Tema Gelap (Cyberpunk) */
+            --bg-primary: #0d0221;
+            --bg-secondary: #02010a;
+            --bg-tertiary: rgba(5, 217, 232, 0.1);
+            --bg-overlay: rgba(0,0,0,0.7);
+            --bg-table-header: rgba(5, 217, 232, 0.1);
+            --bg-table-row-even: rgba(255,255,255,0.03);
+            --bg-table-row-hover: rgba(5, 217, 232, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --text-placeholder: rgba(5, 217, 232, 0.5);
+            --accent-pink: #ff2a6d;
+            --accent-blue: #05d9e8;
+            --accent-green: #00ff9d;
+            --border-color: rgba(5, 217, 232, 0.2);
+            --card-bg: rgba(0, 0, 0, 0.6);
+            --input-bg: rgba(0, 0, 0, 0.5);
+            --grid-color: rgba(5, 217, 232, 0.1);
+            --shadow-color-blue: #05d9e8;
+            --shadow-color-pink: #ff2a6d;
+            --shadow-color-green: #00ff9d;
+            --highlight-success-bg: rgba(0, 255, 157, 0.2);
+            --highlight-warning-bg: rgba(250, 204, 21, 0.2);
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        
+        h1, h2, h3, .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        /* --- EFEK & WARNA AKAN --- */
+        .neon-text-pink { color: var(--accent-pink); }
+        .neon-text-blue { color: var(--accent-blue); }
+        .neon-text-green { color: var(--accent-green); }
+        
+        html.dark .neon-text-pink { text-shadow: 0 0 5px var(--accent-pink), 0 0 10px var(--accent-pink); }
+        html.dark .neon-text-blue { text-shadow: 0 0 5px var(--accent-blue), 0 0 10px var(--accent-blue); }
+        html.dark .neon-text-green { text-shadow: 0 0 5px var(--accent-green), 0 0 10px var(--accent-green); }
+
+        .neon-border-pink { border: 1px solid var(--accent-pink); box-shadow: 0 0 8px var(--shadow-color-pink), inset 0 0 8px var(--shadow-color-pink); }
+        .neon-border-blue { border: 1px solid var(--accent-blue); box-shadow: 0 0 8px var(--shadow-color-blue), inset 0 0 8px var(--shadow-color-blue); }
+
+        /* --- EFEK LATAR BELAKANG --- */
+        .grid-bg {
+            position: relative;
+            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+        .grid-bg::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg-primary) 75%);
+            pointer-events: none;
+            transition: background 0.5s;
+        }
+        .scanline {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0) 100%);
+            background-size: 100% 6px;
+            pointer-events: none;
+            animation: scanline 10s linear infinite;
+            z-index: 9998;
+        }
+        html:not(.dark) .scanline { display: none; } /* Sembunyikan di tema terang */
+
+        @keyframes scanline { 0% { background-position: 0 0; } 100% { background-position: 0 100vh; } }
+        .flicker { animation: flicker 5s infinite alternate; }
+        @keyframes flicker { 0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; } 20%, 22%, 24%, 55% { opacity: 0.8; } }
+
+        /* --- KOMPONEN UI --- */
+        .cyber-header, .cyber-footer {
+            background-color: var(--card-bg);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 8px var(--shadow-color-blue), inset 0 0 8px var(--shadow-color-blue);
+            backdrop-filter: blur(5px);
+            transition: background-color 0.5s, border-color 0.5s, box-shadow 0.5s;
+        }
+
+        .cyber-button {
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            background-color: transparent;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.25rem;
+            text-transform: uppercase;
+        }
+        .cyber-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--shadow-color-blue);
+            color: var(--text-primary);
+            background-color: var(--bg-tertiary);
+        }
+        .cyber-button.pink { border-color: var(--accent-pink); color: var(--accent-pink); }
+        .cyber-button.pink:hover { box-shadow: 0 0 15px var(--shadow-color-pink); }
+        .cyber-button.green { border-color: var(--accent-green); color: var(--accent-green); }
+        .cyber-button.green:hover { box-shadow: 0 0 15px var(--shadow-color-green); }
+        
+        .cyber-input, .cyber-select {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: 0.25rem;
+            width: 100%;
+        }
+        .cyber-input:focus, .cyber-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 10px var(--shadow-color-blue);
+        }
+        .cyber-input::placeholder { color: var(--text-placeholder); }
+
+        .cyber-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(5px);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            position: relative;
+            transition: background-color 0.5s, border-color 0.5s;
+        }
+
+        /* --- NAVIGASI Samping --- */
+        #hamburger-btn { z-index: 3001; background: none; border: none; cursor: pointer; width: 40px; height: 40px; position: relative; }
+        .hamburger-bar { display: block; width: 30px; height: 3px; background-color: var(--accent-blue); margin: 6px auto; transition: all 0.3s ease-in-out; box-shadow: 0 0 4px var(--shadow-color-blue); }
+        #hamburger-btn.open .bar1 { transform: translateY(9px) rotate(45deg); }
+        #hamburger-btn.open .bar2 { opacity: 0; }
+        #hamburger-btn.open .bar3 { transform: translateY(-9px) rotate(-45deg); }
+        #sidebar-nav { position: fixed; top: 0; left: -300px; width: 300px; height: 100vh; background: var(--card-bg); backdrop-filter: blur(10px); border-right: 2px solid var(--accent-blue); box-shadow: 0 0 20px var(--shadow-color-blue); padding: 80px 20px 20px; z-index: 3000; transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 0.5s; }
+        #sidebar-nav.open { left: 0; }
+        .cyber-tab { display: block; padding: 15px 20px; cursor: pointer; position: relative; font-family: 'Orbitron', sans-serif; color: var(--text-secondary); transition: all 0.3s; margin-bottom: 10px; border: 1px solid transparent; border-radius: 4px; }
+        .cyber-tab.active { color: var(--accent-blue); background-color: var(--bg-tertiary); border-color: var(--accent-blue); }
+        .cyber-tab:hover { color: var(--text-primary); background-color: var(--bg-tertiary); }
+        #page-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); z-index: 2999; opacity: 0; visibility: hidden; transition: opacity 0.4s, visibility 0.4s, background-color 0.5s; }
+        #page-overlay.open { opacity: 1; visibility: visible; }
+
+        /* --- TABEL --- */
+        .cyber-table-container { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 0.5rem; }
+        .cyber-table { width: 100%; border-collapse: collapse; min-width: 800px; background: transparent; }
+        .cyber-table th, .cyber-table td { border: 1px solid var(--border-color); padding: 0.75rem; text-align: center; vertical-align: middle; transition: background-color 0.3s; }
+        .cyber-table th { font-family: 'Orbitron', sans-serif; background-color: var(--bg-table-header); color: var(--accent-blue); position: sticky; top: 0; z-index: 2; }
+        .cyber-table th[data-category="gainer"] { color: var(--accent-green); }
+        .cyber-table th[data-category="loser"] { color: var(--accent-pink); }
+        html.dark .cyber-table th[data-category="gainer"] { background-color: rgba(0, 255, 157, 0.1); }
+        html.dark .cyber-table th[data-category="loser"] { background-color: rgba(255, 42, 109, 0.1); }
+        .cyber-table td:first-child, .cyber-table th:first-child { position: sticky; left: 0; background-color: var(--bg-primary); z-index: 1; }
+        .cyber-table tbody tr:nth-child(even) { background-color: var(--bg-table-row-even); }
+        .cyber-table tbody tr:hover td { background-color: var(--bg-table-row-hover); }
+        .cyber-table tbody tr:hover td:first-child { background-color: var(--bg-table-row-hover); }
+        .cyber-table tfoot { font-weight: 700; }
+        .cyber-table tfoot td { background-color: var(--bg-table-header); color: var(--accent-blue); }
+        .cyber-table .highlight-success { background-color: var(--highlight-success-bg) !important; color: var(--accent-green); }
+        .cyber-table .highlight-warning { background-color: var(--highlight-warning-bg) !important; color: #facc15; }
+        .cyber-table [contenteditable="true"]:focus { background-color: var(--bg-table-row-hover); outline: 2px solid var(--accent-blue); box-shadow: 0 0 5px var(--shadow-color-blue); }
+
+        /* --- MODAL & UTILITAS --- */
+        .cyber-modal { display: none; position: fixed; z-index: 4000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+        .cyber-modal-content { background-color: var(--bg-primary); border: 2px solid var(--accent-blue); box-shadow: 0 0 30px var(--shadow-color-blue); padding: 2rem; max-width: 500px; width: 90%; animation: modalAppear 0.5s; transition: background-color 0.5s; }
+        @keyframes modalAppear { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        #loader, #error-toast { position: fixed; background-color: var(--bg-primary); border: 2px solid var(--accent-pink); box-shadow: 0 0 20px var(--shadow-color-pink); color: var(--accent-pink); padding: 1rem; z-index: 4001; transition: opacity 0.3s, background-color 0.5s; }
+        #loader { top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 1rem 2rem; font-family: 'Orbitron', sans-serif; }
+        #error-toast { bottom: 20px; right: 20px; }
+
+        /* --- SAKELAR TEMA --- */
+        .theme-switch-wrapper { display: flex; align-items: center; }
+        .theme-switch { display: inline-block; height: 34px; position: relative; width: 60px; }
+        .theme-switch input { display:none; }
+        .slider { background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; }
+        .slider:before { background-color: #fff; bottom: 4px; content: ""; height: 26px; left: 4px; position: absolute; transition: .4s; width: 26px; }
+        input:checked + .slider { background-color: var(--accent-blue); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .slider.round { border-radius: 34px; }
+        .slider.round:before { border-radius: 50%; }
+
+        /* --- 3D ANIMATION --- */
+        #animation-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; z-index: -1; opacity: 0.2; }
+    </style>
+    
+    <style>
+      /* ================================== */
+      /* == CSS UNTUK WATERMARK FUTURISTIK == */
+      /* ================================== */
+      #futuristic-watermark {
+        position: fixed; bottom: 25px; left: 25px; padding: 8px 15px; min-width: 212px;
+        font-family: 'Roboto Mono', monospace; font-weight: 500;
+        backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+        border-radius: 10px; z-index: 9999; cursor: pointer; user-select: none; overflow: hidden;
+        opacity: 0; animation: slideUpFadeIn 1s ease-out 0.5s forwards;
+        transition: background-color 0.5s ease, color 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      }
+      #futuristic-watermark:hover { transform: translateY(-5px) scale(1.03); }
+      #particle-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+      .f-content-wrapper { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; min-height: 18px; }
+      .f-content { display: flex; align-items: center; gap: 10px; transition: opacity 0.4s ease, transform 0.4s ease; }
+      .f-content.hidden { opacity: 0; pointer-events: none; position: absolute; transform: scale(0.9); }
+      .f-logo-container { width: 18px; height: 18px; transition: transform 0.4s ease; flex-shrink: 0; }
+      .f-logo-container.reacting { animation: logo3DFlip 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+      .f-logo-container svg { width: 100%; height: 100%; stroke-width: 8; transition: stroke 0.5s ease; }
+      #f-watermark-text, #f-follow-message { transition: color 0.5s ease; }
+      #f-watermark-text { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+      #f-follow-message { font-size: 11px; letter-spacing: 0.2px; font-weight: 700; text-align: center; white-space: nowrap; }
+      @keyframes slideUpFadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes logo3DFlip { 0% { transform: rotateY(0deg); filter: brightness(1); } 50% { transform: rotateY(180deg); } 100% { transform: rotateY(360deg); filter: brightness(1); } }
+      
+      /* Tema Terang Watermark */
+      #futuristic-watermark.light-mode {
+        background: rgba(245, 248, 252, 0.85);
+        border: 1px solid rgba(60, 100, 150, 0.3);
+        color: rgba(10, 25, 40, 0.95);
+        box-shadow: 0 0 15px rgba(60, 100, 150, 0.15), 0 0 30px rgba(60, 100, 150, 0.1), inset 0 0 10px rgba(60, 100, 150, 0.1);
+      }
+      #futuristic-watermark.light-mode:hover { border-color: rgba(60, 100, 150, 0.8); box-shadow: 0 0 25px rgba(60, 100, 150, 0.4), 0 0 50px rgba(60, 100, 150, 0.25), inset 0 0 12px rgba(60, 100, 150, 0.2); }
+      #futuristic-watermark.light-mode .f-logo-container svg { stroke: hsl(220, 90%, 60%); }
+      #futuristic-watermark.light-mode @keyframes logo3DFlip { 50% { filter: brightness(1.5) drop-shadow(0 0 8px hsl(220, 90%, 60%)); } }
+      
+      /* Tema Gelap Watermark */
+      #futuristic-watermark:not(.light-mode) {
+        background: rgba(10, 25, 40, 0.85);
+        border: 1px solid rgba(127, 255, 212, 0.3);
+        color: rgba(230, 255, 255, 0.95);
+        box-shadow: 0 0 15px rgba(127, 255, 212, 0.15), 0 0 30px rgba(127, 255, 212, 0.1), inset 0 0 10px rgba(127, 255, 212, 0.1);
+      }
+      #futuristic-watermark:not(.light-mode):hover { border-color: rgba(127, 255, 212, 0.8); box-shadow: 0 0 25px rgba(127, 255, 212, 0.4), 0 0 50px rgba(127, 255, 212, 0.25), inset 0 0 12px rgba(127, 255, 212, 0.2); }
+      #futuristic-watermark:not(.light-mode) .f-logo-container svg { stroke: hsl(186, 100%, 50%); }
+      #futuristic-watermark:not(.light-mode) @keyframes logo3DFlip { 50% { filter: brightness(2) drop-shadow(0 0 8px hsl(186, 100%, 50%)); } }
+    </style>
+</head>
+<body class="grid-bg">
+    <div class="scanline"></div>
+    <div id="page-overlay"></div>
+    <div id="animation-container"></div>
+    
+    <!-- Navigasi Samping -->
+    <nav id="sidebar-nav">
+    	<div id="nav-strategy" data-tab="strategy" class="cyber-tab">Strategi Multiple Entery</div>
+    	<div id="nav-rr" data-tab="rr" class="cyber-tab">Strategi One Entery</div>
+        <div id="nav-analyzer" data-tab="analyzer" class="cyber-tab">Analisis Pergerakan Koin Crypto</div>
+    </nav>
+
+    <div class="relative z-10">
+        <!-- Header -->
+        <header class="cyber-header py-4 px-6 flex justify-between items-center border-b-2">
+            <div class="flex items-center space-x-4">
+                <button id="hamburger-btn" aria-label="Buka Menu">
+                    <span class="hamburger-bar bar1"></span>
+                    <span class="hamburger-bar bar2"></span>
+                    <span class="hamburger-bar bar3"></span>
+                </button>
+                <h1 class="text-xl md:text-2xl font-bold neon-text-pink flicker" data-text="URANUS CRYPTO">URANUS CRYPTO</h1>
+            </div>
+            <div class="flex items-center space-x-4 md:space-x-6">
+                <div class="text-center">
+                    <p class="text-xs text-secondary">WAKTU LOKAL</p>
+                    <p id="current-time" class="text-lg neon-text-blue font-orbitron">00:00:00</p>
+                </div>
+                <!-- Sakelar Tema -->
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="theme-toggle">
+                        <input type="checkbox" id="theme-toggle" />
+                        <div class="slider round"></div>
+                    </label>
+                </div>
+                <div class="w-2 h-2 rounded-full bg-green-500 pulse" id="connectionStatus"></div>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+            <!-- Konten akan dimuat di sini oleh JavaScript -->
+            <!-- ================================== -->
+            <!-- == KONTEN TAB: STRATEGI MULTIPLE ENTERY == -->
+            <!-- ================================== -->
+            <div id="content-strategy" class="tab-content">
+                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 cyber-card">
+                    <div>
+                        <label for="s-coinName" class="block text-sm font-semibold text-secondary mb-2">Nama Koin</label>
+                        <input type="text" id="s-coinName" data-placeholder="Solana" class="cyber-input">
+                    </div>
+                    <div>
+                        <label for="s-totalCapital" class="block text-sm font-semibold text-secondary mb-2">Total Modal (Rp)</label>
+                        <input type="number" id="s-totalCapital" data-placeholder="1000000" class="cyber-input">
+                    </div>
+                    <div>
+                        <label for="s-currentPrice" class="block text-sm font-semibold text-secondary mb-2">Harga Awal (Rp)</label>
+                        <input type="number" id="s-currentPrice" data-placeholder="2000000" class="cyber-input">
+                    </div>
+                    <div>
+                        <label for="s-targetProfit" class="block text-sm font-semibold text-secondary mb-2">Target Profit (%)</label>
+                        <input type="number" id="s-targetProfit" data-placeholder="100" class="cyber-input">
+                    </div>
+                </section>
+
+                <div id="s-pdf-content-wrapper" class="cyber-card p-6 sm:p-8">
+                    <div class="summary-header mb-6 pb-6 border-b border-border-color">
+                        <h2 id="s-summary-title" class="text-center text-2xl sm:text-3xl font-bold neon-text-blue mb-3"></h2>
+                        <div class="flex justify-center items-center gap-x-6 gap-y-2 flex-wrap text-center text-secondary text-sm sm:text-base">
+                            <span id="s-summary-capital"></span>
+                            <span id="s-summary-price"></span>
+                            <span id="s-summary-profit"></span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold neon-text-green mb-4">✅ Rencana Beli (BUY)</h3>
+                            <div class="cyber-table-container"><table class="cyber-table min-w-full"><thead><tr><th>OPB</th><th>Harga Beli</th><th>Modal</th><th>Jumlah Koin</th></tr></thead><tbody id="s-buy-table-body"></tbody></table></div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold neon-text-green mb-4">💰 Target Jual & Profit</h3>
+                            <div class="cyber-table-container"><table class="cyber-table min-w-full"><thead><tr><th>OPS</th><th>Target Jual</th><th>Total Koin</th><th>Estimasi Profit</th></tr></thead><tbody id="s-sell-target-table-body"></tbody></table></div>
+                        </div>
+                        <div class="lg:col-span-2">
+                             <h3 class="text-xl font-semibold neon-text-green mb-4">📊 Harga Rata-Rata (Kumulatif)</h3>
+                            <div class="cyber-table-container"><table class="cyber-table min-w-full"><thead><tr><th>Tahap</th><th>Harga Rata-rata</th></tr></thead><tbody id="s-avg-price-table-body"></tbody></table></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-10">
+                    <div class="flex justify-center items-center gap-4">
+                        <button id="s-download-btn" class="cyber-button green">Download PDF</button>
+                        <button id="s-download-image-btn" class="cyber-button">Download Gambar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======================================= -->
+            <!-- == KONTEN TAB: ANALISIS PERGERAKAN Koin Crypto == -->
+            <!-- ======================================= -->
+            <div id="content-analyzer" class="tab-content hidden">
+                <div class="cyber-card">
+                    <h1 class="text-3xl neon-text-blue text-center mb-6">Analisis Pergerakan Koin Crypto</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="cyber-card neon-border-blue">
+                            <label for="target-profit" class="font-orbitron neon-text-blue mb-2 block">Target Profit Tabel (%):</label>
+                            <input type="number" id="target-profit" value="100" class="cyber-input">
+                            <p class="text-xs text-secondary mt-2">Target profit untuk perhitungan otomatis di tabel bawah.</p>
+                        </div>
+                        <div class="cyber-card neon-border-blue">
+                            <label class="font-orbitron neon-text-blue mb-2 block">Kalkulator Recovery Manual</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="number" id="initial-capital" placeholder="Modal Awal (Rp)" class="cyber-input">
+                                <input type="number" id="loss-percentage" placeholder="Persentase Rugi (%)" class="cyber-input">
+                            </div>
+                            <p id="recovery-result" class="text-sm mt-3 min-h-[3em]"></p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-4 mb-6">
+                        <button id="add-day-btn" class="cyber-button">Tambah Hari</button>
+                        <button id="remove-day-btn" class="cyber-button pink">Hapus Hari</button>
+                        <button id="add-coin-btn" class="cyber-button">Tambah Koin</button>
+                        <button id="delete-coin-btn" class="cyber-button pink">Mode Hapus Koin</button>
+                        <button id="clear-all-data-btn" class="cyber-button pink">Hapus Angka</button>
+                        <button id="download-pdf-btn-analyzer" class="cyber-button green">Download PDF</button>
+                        <button id="download-image-btn-analyzer" class="cyber-button">Download Gambar</button>
+                    </div>
+                    <div class="cyber-table-container">
+                        <table id="crypto-table" class="cyber-table">
+                            <thead><tr id="header-row"></tr></thead>
+                            <tbody id="table-body"></tbody>
+                            <tfoot id="table-foot">
+                                <tr id="total-row"></tr>
+                                <tr id="recovery-row"></tr>
+                                <tr id="status-row"></tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================================== -->
+            <!-- == KONTEN TAB: SIMULASI RISK-REWARD == -->
+            <!-- ==================================== -->
+            <div id="content-rr" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="cyber-card neon-border-blue">
+                        <h2 class="text-2xl font-bold neon-text-blue mb-6">Input Data Simulasi</h2>
+                        <div class="space-y-5">
+                            <div>
+                                <label for="rr-coin-name" class="block text-sm font-semibold text-secondary mb-2">Nama Koin</label>
+                                <input type="text" id="rr-coin-name" placeholder="Contoh: BTC" class="cyber-input">
+                            </div>
+                            <div>
+                                <label for="rr-entry" class="block text-sm font-semibold text-secondary mb-2">Entry Price (Rp)</label>
+                                <input type="number" id="rr-entry" placeholder="Contoh: 1000000000" class="cyber-input">
+                            </div>
+                            <div>
+                                <label for="rr-sl" class="block text-sm font-semibold text-secondary mb-2">Stop Loss (%)</label>
+                                <input type="number" id="rr-sl" placeholder="Contoh: 5" class="cyber-input">
+                            </div>
+                            <div>
+                                <label for="rr-tp" class="block text-sm font-semibold text-secondary mb-2">Take Profit (%)</label>
+                                <input type="number" id="rr-tp" placeholder="Contoh: 15" class="cyber-input">
+                            </div>
+                            <div>
+                                <label for="rr-modal" class="block text-sm font-semibold text-secondary mb-2">Modal (Rp)</label>
+                                <input type="number" id="rr-modal" placeholder="Contoh: 1000000" class="cyber-input">
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <button id="rr-calculate-btn" class="w-full cyber-button">Hitung Simulasi</button>
+                        </div>
+                    </div>
+                    
+                    <div id="rr-pdf-content" class="cyber-card neon-border-pink">
+                        <h2 class="text-2xl font-bold neon-text-pink mb-6">Strategi One Entery</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[500px] text-sm cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th class="p-3 text-left">Keterangan</th>
+                                        <th class="p-3 text-left">Input</th>
+                                        <th class="p-3 text-left">Hasil</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rr-results-body"></tbody>
+                            </table>
+                            <div id="rr-placeholder" class="text-center py-10 text-secondary">
+                                <p>Hasil strategi one entery akan muncul di sini.</p>
+                            </div>
+                        </div>
+                        <div id="rr-download-container" class="text-center mt-8 hidden">
+                            <div class="flex justify-center items-center gap-4">
+                                <button id="rr-download-btn" class="cyber-button green">Download PDF</button>
+                                <button id="rr-download-image-btn" class="cyber-button">Download Gambar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="cyber-footer border-t-2 py-3 px-6 mt-6 text-center">
+            <p class="text-xs text-secondary">© 2025 URANUS CRYPTO | <span class="neon-text-pink">ULTRA SECURE</span> | <span class="neon-text-green">HIGH FREQUENCY EXECUTION</span></p>
+        </footer>
+    </div>
+
+    <!-- Modal untuk Tambah Koin -->
+    <div id="add-coin-modal" class="cyber-modal">
+        <div class="cyber-modal-content">
+            <h2 class="font-orbitron text-xl neon-text-blue mb-4">Tambah Koin Baru</h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="new-coin-name" class="block mb-2 text-sm">Nama Koin (e.g., BTC):</label>
+                    <input type="text" id="new-coin-name" placeholder="Masukkan nama koin" class="cyber-input">
+                </div>
+                <div>
+                    <label for="new-coin-category" class="block mb-2 text-sm">Kategori:</label>
+                    <select id="new-coin-category" class="cyber-select">
+                        <option value="gainer">Top Gainer</option>
+                        <option value="loser">Top Loser</option>
+                        <option value="neutral">Netral</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-4 mt-6">
+                <button id="cancel-add-coin-btn" class="cyber-button pink">Batal</button>
+                <button id="save-new-coin-btn" class="cyber-button">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elemen Utilitas Global -->
+    <div id="loader" class="hidden">Membuat PDF...</div>
+    <div id="error-toast" class="hidden opacity-0"><span id="error-message"></span></div>
+
+    <!-- Skrip untuk Dasbor -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- MANAJEMEN TEMA ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const watermarkEl = document.getElementById('futuristic-watermark');
+        
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+                if (watermarkEl) watermarkEl.classList.add('light-mode');
+                themeToggle.checked = true;
+            } else {
+                document.documentElement.classList.add('dark');
+                if (watermarkEl) watermarkEl.classList.remove('light-mode');
+                themeToggle.checked = false;
+            }
+        }
+
+        themeToggle.addEventListener('change', () => {
+            const newTheme = themeToggle.checked ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+
+        const savedTheme = localStorage.getItem('theme') || 'dark'; // Default ke gelap
+        applyTheme(savedTheme);
+
+
+        // --- UTILITAS & ELEMEN GLOBAL ---
+        const loader = document.getElementById('loader');
+        const errorToast = document.getElementById('error-toast');
+        const errorMessage = document.getElementById('error-message');
+        const formatCurrency = (v) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(v);
+        const formatNumber = (v) => new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 8 }).format(v);
+        const formatPercent = (v) => `${v}%`;
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorToast.classList.remove('hidden', 'opacity-0');
+            errorToast.classList.add('opacity-100');
+            setTimeout(() => {
+                errorToast.classList.remove('opacity-100');
+                errorToast.classList.add('hidden', 'opacity-0');
+            }, 4000);
+        }
+
+        // --- JAM REAL-TIME ---
+        function updateTime() {
+            const timeString = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('current-time').textContent = timeString;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // --- SETUP ANIMASI 3D ---
+        (() => {
+            const container = document.getElementById('animation-container');
+            if (!container) return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            const gridHelper = new THREE.GridHelper(20, 40, 0x05d9e8, 0x05d9e8);
+            gridHelper.material.opacity = 0.15;
+            gridHelper.material.transparent = true;
+            scene.add(gridHelper);
+
+            const group = new THREE.Group();
+            const candleData = [
+                { open: 30, close: 40, high: 45, low: 28 }, { open: 40, close: 35, high: 42, low: 32 },
+                { open: 35, close: 50, high: 55, low: 34 }, { open: 50, close: 45, high: 52, low: 43 },
+                { open: 45, close: 60, high: 62, low: 44 }, { open: 60, close: 70, high: 72, low: 58 },
+                { open: 70, close: 65, high: 71, low: 63 }
+            ];
+
+            candleData.forEach((data, index) => {
+                const isUp = data.close >= data.open;
+                const bodyHeight = Math.abs(data.close - data.open);
+                const bodyGeometry = new THREE.BoxGeometry(0.8, bodyHeight / 5, 0.8);
+                const bodyMaterial = new THREE.MeshStandardMaterial({
+                    color: isUp ? 0x00ff9d : 0xff2a6d,
+                    emissive: isUp ? 0x00ff9d : 0xff2a6d,
+                    emissiveIntensity: 0.8,
+                    metalness: 0.1,
+                    roughness: 0.5,
+                });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                body.position.set(index * 1.5 - (candleData.length * 1.5 / 2), (data.close + data.open) / 2 / 5 - 8, 0);
+
+                const wickHeight = data.high - data.low;
+                const wickGeometry = new THREE.BoxGeometry(0.1, wickHeight / 5, 0.1);
+                const wickMaterial = new THREE.MeshBasicMaterial({ color: bodyMaterial.color });
+                const wick = new THREE.Mesh(wickGeometry, wickMaterial);
+                wick.position.set(index * 1.5 - (candleData.length * 1.5 / 2), (data.high + data.low) / 2 / 5 - 8, 0);
+
+                group.add(body);
+                group.add(wick);
+            });
+            scene.add(group);
+            
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+            scene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0x05d9e8, 1, 100);
+            pointLight.position.set(0, 5, 10);
+            scene.add(pointLight);
+            const pointLight2 = new THREE.PointLight(0xff2a6d, 1, 100);
+            pointLight2.position.set(0, -5, -10);
+            scene.add(pointLight2);
+
+            camera.position.z = 15;
+            camera.position.y = 0;
+            camera.lookAt(0,0,0);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                group.rotation.y += 0.005;
+                gridHelper.rotation.y += 0.001;
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
+        })();
+
+
+        // --- LOGIKA NAVIGASI (HAMBURGER & SIDEBAR) ---
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const pageOverlay = document.getElementById('page-overlay');
+        const navButtons = document.querySelectorAll('.cyber-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        function toggleMenu() {
+            hamburgerBtn.classList.toggle('open');
+            sidebarNav.classList.toggle('open');
+            pageOverlay.classList.toggle('open');
+        }
+
+        function closeMenu() {
+            hamburgerBtn.classList.remove('open');
+            sidebarNav.classList.remove('open');
+            pageOverlay.classList.remove('open');
+        }
+
+        function switchTab(targetTab) {
+            tabContents.forEach(content => {
+                content.id === `content-${targetTab}` ? content.classList.remove('hidden') : content.classList.add('hidden');
+            });
+            navButtons.forEach(btn => {
+                btn.dataset.tab === targetTab ? btn.classList.add('active') : btn.classList.remove('active');
+            });
+        }
+
+        hamburgerBtn.addEventListener('click', toggleMenu);
+        pageOverlay.addEventListener('click', closeMenu);
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                switchTab(button.dataset.tab);
+                closeMenu();
+            });
+        });
+
+        switchTab('strategy');
+
+        // --- LOGIKA APLIKASI ANALYZER ---
+        (() => {
+            const cryptoTable = document.getElementById('crypto-table');
+            if (!cryptoTable) return;
+            
+            const tableBody = document.getElementById('table-body');
+            const headerRow = document.getElementById('header-row');
+            const totalRow = document.getElementById('total-row');
+            const recoveryRow = document.getElementById('recovery-row');
+            const statusRow = document.getElementById('status-row');
+            const targetProfitInput = document.getElementById('target-profit');
+            const addDayBtn = document.getElementById('add-day-btn');
+            const removeDayBtn = document.getElementById('remove-day-btn');
+            const addCoinBtn = document.getElementById('add-coin-btn');
+            const deleteCoinBtn = document.getElementById('delete-coin-btn');
+            const clearAllDataBtn = document.getElementById('clear-all-data-btn');
+            const downloadPdfBtnAnalyzer = document.getElementById('download-pdf-btn-analyzer');
+            const downloadImageBtnAnalyzer = document.getElementById('download-image-btn-analyzer');
+            const modal = document.getElementById('add-coin-modal');
+            const saveNewCoinBtn = document.getElementById('save-new-coin-btn');
+            const cancelAddCoinBtn = document.getElementById('cancel-add-coin-btn');
+            const newCoinNameInput = document.getElementById('new-coin-name');
+            const newCoinCategorySelect = document.getElementById('new-coin-category');
+            const initialCapitalInput = document.getElementById('initial-capital');
+            const lossPercentageInput = document.getElementById('loss-percentage');
+            const recoveryResultEl = document.getElementById('recovery-result');
+
+            let isDeleteMode = false;
+            const STORAGE_KEY = 'cryptoAnalysisData_cyberpunk';
+
+            function loadData() {
+                const savedData = localStorage.getItem(STORAGE_KEY);
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    targetProfitInput.value = data.targetProfit || 100;
+                    initialCapitalInput.value = data.initialCapital || '';
+                    lossPercentageInput.value = data.lossPercentage || '';
+                    buildTableFromData(data);
+                } else {
+                    initializeApp();
+                }
+                updateAll();
+            }
+
+            function saveData() {
+                const headers = Array.from(headerRow.querySelectorAll('th')).map(th => ({
+                    text: th.childNodes[0].nodeValue || th.innerText,
+                    category: th.dataset.category || 'fixed'
+                }));
+                const bodyData = Array.from(tableBody.querySelectorAll('tr')).map(row => 
+                    Array.from(row.querySelectorAll('td')).map(td => td.innerText)
+                );
+                const dataToSave = {
+                    targetProfit: targetProfitInput.value,
+                    initialCapital: initialCapitalInput.value,
+                    lossPercentage: lossPercentageInput.value,
+                    headers: headers,
+                    bodyData: bodyData
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+            }
+
+            function buildTableFromData(data) {
+                headerRow.innerHTML = '';
+                tableBody.innerHTML = '';
+                totalRow.innerHTML = '';
+                recoveryRow.innerHTML = '';
+                statusRow.innerHTML = '';
+                
+                data.headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.innerText = header.text;
+                    th.dataset.category = header.category;
+                    if(header.category !== 'fixed') th.contentEditable = true;
+                    headerRow.appendChild(th);
+                });
+
+                data.bodyData.forEach(rowData => {
+                    const tr = document.createElement('tr');
+                    rowData.forEach((cellData, index) => {
+                        const td = document.createElement('td');
+                        td.innerText = cellData;
+                        if (index > 0) td.contentEditable = true;
+                        tr.appendChild(td);
+                    });
+                    tableBody.appendChild(tr);
+                });
+
+                totalRow.innerHTML = `<td contenteditable="false">Total %</td>`;
+                recoveryRow.innerHTML = `<td contenteditable="false">Recovery</td>`;
+                statusRow.innerHTML = `<td contenteditable="false">Status Target</td>`;
+                for (let i = 1; i < data.headers.length; i++) {
+                    totalRow.insertAdjacentHTML('beforeend', `<td>0%</td>`);
+                    recoveryRow.insertAdjacentHTML('beforeend', `<td>-</td>`);
+                    statusRow.insertAdjacentHTML('beforeend', `<td>-</td>`);
+                }
+            }
+
+            function initializeApp() {
+                const defaultHeaders = [
+                    { text: 'Hari', category: 'fixed' },
+                    { text: 'Gainer 1', category: 'gainer' },
+                    { text: 'Loser 1', category: 'loser' },
+                    { text: 'Keterangan', category: 'fixed' },
+                ];
+                const defaultBodyData = Array.from({ length: 30 }, (_, i) => {
+                    const row = Array(defaultHeaders.length).fill('');
+                    row[0] = i + 1;
+                    return row;
+                });
+                buildTableFromData({
+                    targetProfit: 100,
+                    headers: defaultHeaders,
+                    bodyData: defaultBodyData
+                });
+                saveData();
+            }
+
+            function updateAutomaticCalculations() {
+                const targetProfit = parseFloat(targetProfitInput.value) || 0;
+                const numCols = headerRow.children.length;
+                const numRows = tableBody.children.length;
+
+                for (let colIndex = 1; colIndex < numCols; colIndex++) {
+                    const headerCell = headerRow.children[colIndex];
+                    if (headerCell.dataset.category === 'fixed') {
+                        continue;
+                    }
+
+                    let currentCapital = 100.0, hasBeenInLoss = false, isRecovered = false, recoveryDay = 0;
+                    for (let rowIndex = 0; rowIndex < numRows; rowIndex++) {
+                        const cell = tableBody.children[rowIndex].children[colIndex];
+                        const dailyChange = parseFloat(cell.innerText) || 0;
+                        currentCapital *= (1 + dailyChange / 100);
+                        if (currentCapital < 100 && !hasBeenInLoss) hasBeenInLoss = true;
+                        if (hasBeenInLoss && !isRecovered && currentCapital >= 100) {
+                            isRecovered = true;
+                            recoveryDay = rowIndex + 1;
+                        }
+                    }
+
+                    const totalCell = totalRow.children[colIndex];
+                    const recoveryCell = recoveryRow.children[colIndex];
+                    const statusCell = statusRow.children[colIndex];
+                    
+                    const allColCells = Array.from(document.querySelectorAll(`#crypto-table tr > *:nth-child(${colIndex + 1})`));
+                    allColCells.forEach(el => el.classList.remove('highlight-success', 'highlight-warning'));
+
+                    const totalCompoundedProfit = currentCapital - 100;
+                    totalCell.innerText = `${totalCompoundedProfit.toFixed(2)}%`;
+                    
+                    if (!hasBeenInLoss) {
+                        recoveryCell.innerText = 'Profit';
+                        recoveryCell.classList.add('highlight-success');
+                    } else if (isRecovered) {
+                        recoveryCell.innerText = `Pulih H-${recoveryDay}`;
+                        recoveryCell.classList.add('highlight-warning');
+                    } else {
+                        recoveryCell.innerText = 'Belum Pulih';
+                    }
+
+                    if (totalCompoundedProfit >= targetProfit) {
+                        statusCell.innerText = 'Tercapai';
+                        allColCells.forEach(el => el.classList.add('highlight-success'));
+                    } else {
+                        statusCell.innerText = 'Belum';
+                    }
+                }
+            }
+            
+            function updateManualRecoveryCalculator() {
+                const capital = parseFloat(initialCapitalInput.value);
+                const lossPercent = parseFloat(lossPercentageInput.value);
+
+                if (isNaN(capital) || isNaN(lossPercent)) {
+                    recoveryResultEl.innerHTML = '...';
+                    return;
+                }
+                
+                const lossAmount = capital * (lossPercent / 100);
+                const remainingCapital = capital - lossAmount;
+                const formattedRemainingCapital = formatCurrency(remainingCapital);
+
+                if (lossPercent >= 100) {
+                    recoveryResultEl.innerHTML = `Modal menjadi <strong class="neon-text-pink">${formattedRemainingCapital}</strong>. Rugi 100% atau lebih tidak dapat pulih.`;
+                    return;
+                }
+
+                if (lossPercent === 0) {
+                     recoveryResultEl.innerHTML = `Modal tetap <strong class="neon-text-blue">${formattedRemainingCapital}</strong>. Tidak perlu kenaikan.`;
+                     return;
+                }
+
+                const recoveryGain = (capital / remainingCapital - 1) * 100;
+                recoveryResultEl.innerHTML = `Modal menjadi <strong class="neon-text-pink">${formattedRemainingCapital}</strong>. Butuh profit <strong class="neon-text-green">${recoveryGain.toFixed(2)}%</strong> untuk kembali ke modal awal.`;
+            }
+
+            function updateAll() {
+                updateAutomaticCalculations();
+                updateManualRecoveryCalculator();
+                saveData();
+            }
+            
+            initialCapitalInput.addEventListener('input', updateAll);
+            lossPercentageInput.addEventListener('input', updateAll);
+            targetProfitInput.addEventListener('input', updateAll);
+            cryptoTable.addEventListener('input', (e) => {
+                if (e.target.isContentEditable) updateAll();
+            });
+
+            addDayBtn.addEventListener('click', () => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `<td contenteditable="false">${tableBody.rows.length + 1}</td>` + Array(headerRow.children.length - 1).fill('<td contenteditable="true"></td>').join('');
+                tableBody.appendChild(newRow);
+                updateAll();
+            });
+
+            removeDayBtn.addEventListener('click', () => {
+                if (tableBody.rows.length > 1) {
+                    tableBody.removeChild(tableBody.lastElementChild);
+                    updateAll();
+                } else showError('Minimal harus ada 1 hari.');
+            });
+
+            addCoinBtn.addEventListener('click', () => {
+                modal.style.display = 'flex';
+                newCoinNameInput.focus();
+            });
+
+            cancelAddCoinBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+            window.addEventListener('click', (event) => { if (event.target == modal) modal.style.display = 'none'; });
+
+            saveNewCoinBtn.addEventListener('click', () => {
+                const coinName = newCoinNameInput.value.trim();
+                const category = newCoinCategorySelect.value;
+                if (!coinName) { showError('Nama koin tidak boleh kosong.'); return; }
+                
+                let referenceNode = null;
+                if (category === 'gainer') referenceNode = headerRow.querySelector('th[data-category="loser"], th[data-category="neutral"], th[data-category="fixed"]:not(:first-child)');
+                else if (category === 'loser') referenceNode = headerRow.querySelector('th[data-category="neutral"], th[data-category="fixed"]:not(:first-child)');
+                else referenceNode = headerRow.querySelector('th[data-category="fixed"]:not(:first-child)');
+
+                const newTh = document.createElement('th');
+                newTh.contentEditable = true;
+                newTh.dataset.category = category;
+                newTh.innerText = coinName;
+                headerRow.insertBefore(newTh, referenceNode);
+
+                const colIndex = Array.from(headerRow.children).indexOf(newTh);
+                Array.from(tableBody.children).forEach(row => {
+                    const newTd = document.createElement('td');
+                    newTd.contentEditable = true;
+                    row.insertBefore(newTd, row.children[colIndex] || null);
+                });
+                
+                totalRow.insertBefore(document.createElement('td'), totalRow.children[colIndex] || null);
+                recoveryRow.insertBefore(document.createElement('td'), recoveryRow.children[colIndex] || null);
+                statusRow.insertBefore(document.createElement('td'), statusRow.children[colIndex] || null);
+                
+                newCoinNameInput.value = '';
+                modal.style.display = 'none';
+                updateAll();
+            });
+            
+            function toggleDeleteMode() {
+                isDeleteMode = !isDeleteMode;
+                cryptoTable.classList.toggle('delete-mode-active');
+                deleteCoinBtn.textContent = isDeleteMode ? 'Selesai Hapus' : 'Mode Hapus Koin';
+                deleteCoinBtn.classList.toggle('green', isDeleteMode);
+                deleteCoinBtn.classList.toggle('pink', !isDeleteMode);
+
+                if (isDeleteMode) {
+                    headerRow.querySelectorAll('th[contenteditable="true"]').forEach(th => {
+                        if(th.dataset.category !== 'fixed') {
+                            const deleteIcon = document.createElement('span');
+                            deleteIcon.className = 'delete-icon';
+                            deleteIcon.innerHTML = '&times;';
+                            th.appendChild(deleteIcon);
+                        }
+                    });
+                } else {
+                    headerRow.querySelectorAll('.delete-icon').forEach(icon => icon.remove());
+                }
+            }
+
+            deleteCoinBtn.addEventListener('click', toggleDeleteMode);
+            
+            headerRow.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-icon')) {
+                    const headerToDelete = e.target.parentElement;
+                    const colIndex = Array.from(headerToDelete.parentElement.children).indexOf(headerToDelete);
+                    if (confirm(`Anda yakin ingin menghapus koin "${headerToDelete.childNodes[0].nodeValue}"?`)) {
+                        headerRow.children[colIndex].remove();
+                        Array.from(tableBody.rows).forEach(row => row.children[colIndex].remove());
+                        totalRow.children[colIndex].remove();
+                        recoveryRow.children[colIndex].remove();
+                        statusRow.children[colIndex].remove();
+                        updateAll();
+                    }
+                }
+            });
+
+            clearAllDataBtn.addEventListener('click', () => {
+                if (confirm('Anda yakin ingin menghapus semua angka di tabel?')) {
+                    tableBody.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+                        cell.innerText = '';
+                    });
+                    updateAll();
+                }
+            });
+            
+            function getCanvas(elementId, onclone) {
+                const isDark = document.documentElement.classList.contains('dark');
+                const bgColor = isDark ? '#0d0221' : '#f4f7f9';
+                return html2canvas(document.getElementById(elementId), { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: bgColor,
+                    onclone: onclone
+                });
+            }
+
+            downloadPdfBtnAnalyzer.addEventListener('click', () => {
+                loader.textContent = 'Membuat PDF...';
+                loader.classList.remove('hidden');
+                getCanvas('crypto-table', (doc) => {
+                    doc.querySelectorAll('th:first-child, td:first-child').forEach(el => el.style.position = 'static');
+                }).then(canvas => {
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: [210, 330] }); // F4
+                    const pageMargin = 10;
+                    const pdfWidth = pdf.internal.pageSize.getWidth() - (pageMargin * 2);
+                    const pdfHeight = pdf.internal.pageSize.getHeight() - (pageMargin * 2);
+                    const canvasAspectRatio = canvas.width / canvas.height;
+                    let imgWidth = pdfWidth, imgHeight = imgWidth / canvasAspectRatio;
+                    if (imgHeight > pdfHeight) {
+                        imgHeight = pdfHeight;
+                        imgWidth = imgHeight * canvasAspectRatio;
+                    }
+                    const x = pageMargin + (pdfWidth - imgWidth) / 2;
+                    const y = pageMargin;
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, imgWidth, imgHeight);
+                    pdf.save('uranusfazry_analisis-pergerakan-koin-crypto.pdf');
+                }).catch(err => {
+                    showError("Gagal membuat PDF.");
+                }).finally(() => {
+                    loader.classList.add('hidden');
+                });
+            });
+
+            downloadImageBtnAnalyzer.addEventListener('click', () => {
+                loader.textContent = 'Membuat Gambar...';
+                loader.classList.remove('hidden');
+                getCanvas('crypto-table', (doc) => {
+                    doc.querySelectorAll('th:first-child, td:first-child').forEach(el => el.style.position = 'static');
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'uranusfazry_analisis-pergerakan-koin-crypto.png';
+                    link.href = canvas.toDataURL('image/png');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }).catch(err => {
+                    showError("Gagal membuat gambar.");
+                }).finally(() => {
+                    loader.textContent = 'Membuat PDF...';
+                    loader.classList.add('hidden');
+                });
+            });
+
+            loadData();
+        })();
+
+        // --- LOGIKA APLIKASI KALKULATOR ---
+        (() => {
+            const rrCalculateBtn = document.getElementById('rr-calculate-btn');
+            if(!rrCalculateBtn) return;
+
+            const rrInputs = {
+                coinName: document.getElementById('rr-coin-name'),
+                entry: document.getElementById('rr-entry'),
+                sl: document.getElementById('rr-sl'),
+                tp: document.getElementById('rr-tp'),
+                modal: document.getElementById('rr-modal'),
+            };
+            const rrResultsBody = document.getElementById('rr-results-body');
+            const rrPlaceholder = document.getElementById('rr-placeholder');
+            const rrDownloadContainer = document.getElementById('rr-download-container');
+            const rrDownloadBtn = document.getElementById('rr-download-btn');
+            const rrDownloadImageBtn = document.getElementById('rr-download-image-btn');
+
+            function calculateRiskReward() {
+                const coinName = rrInputs.coinName.value || 'Koin';
+                const entryPrice = parseFloat(rrInputs.entry.value);
+                const stopLossPercent = parseFloat(rrInputs.sl.value);
+                const takeProfitPercent = parseFloat(rrInputs.tp.value);
+                const modal = parseFloat(rrInputs.modal.value);
+                if (!entryPrice || !stopLossPercent || !takeProfitPercent || !modal) {
+                    showError("Harap isi semua kolom input simulasi.");
+                    return;
+                }
+                const hargaStopLoss = entryPrice * (1 - stopLossPercent / 100);
+                const hargaTakeProfit = entryPrice * (1 + takeProfitPercent / 100);
+                const jumlahKoin = modal / entryPrice;
+                const keuntungan = (hargaTakeProfit - entryPrice) * jumlahKoin;
+                const kerugian = (entryPrice - hargaStopLoss) * jumlahKoin;
+                rrResultsBody.innerHTML = `
+                    <tr><td class="p-3 text-left">Nama Koin</td><td class="p-3 font-bold neon-text-blue">${coinName.toUpperCase()}</td><td class="p-3">-</td></tr>
+                    <tr><td class="p-3 text-left">Entry Price</td><td class="p-3">${formatCurrency(entryPrice)}</td><td class="p-3">-</td></tr>
+                    <tr><td class="p-3 text-left">Stop Loss</td><td class="p-3">${formatPercent(stopLossPercent)}</td><td class="p-3">-</td></tr>
+                    <tr><td class="p-3 text-left">Take Profit</td><td class="p-3">${formatPercent(takeProfitPercent)}</td><td class="p-3">-</td></tr>
+                    <tr><td class="p-3 text-left">Modal</td><td class="p-3">${formatCurrency(modal)}</td><td class="p-3">-</td></tr>
+                    <tr><td class="p-3 text-left">Harga Stop Loss</td><td class="p-3">-</td><td class="p-3 font-bold neon-text-pink">${formatCurrency(hargaStopLoss)}</td></tr>
+                    <tr><td class="p-3 text-left">Harga Take Profit</td><td class="p-3">-</td><td class="p-3 font-bold neon-text-green">${formatCurrency(hargaTakeProfit)}</td></tr>
+                    <tr><td class="p-3 text-left">Jumlah Koin</td><td class="p-3">-</td><td class="p-3 font-bold">${formatNumber(jumlahKoin)}</td></tr>
+                    <tr><td class="p-3 text-left">Estimasi Keuntungan</td><td class="p-3">-</td><td class="p-3 font-bold neon-text-green">${formatCurrency(keuntungan)}</td></tr>
+                    <tr><td class="p-3 text-left">Estimasi Kerugian</td><td class="p-3">-</td><td class="p-3 font-bold neon-text-pink">${formatCurrency(kerugian)}</td></tr>
+                `;
+                rrPlaceholder.classList.add('hidden');
+                rrDownloadContainer.classList.remove('hidden');
+            }
+            rrCalculateBtn.addEventListener('click', calculateRiskReward);
+
+            const sInputs = {
+                coinName: document.getElementById('s-coinName'),
+                totalCapital: document.getElementById('s-totalCapital'),
+                currentPrice: document.getElementById('s-currentPrice'),
+                targetProfit: document.getElementById('s-targetProfit'),
+            };
+            const sAllInputs = document.querySelectorAll('#content-strategy input');
+            const sSummary = {
+                title: document.getElementById('s-summary-title'),
+                capital: document.getElementById('s-summary-capital'),
+                price: document.getElementById('s-summary-price'),
+                profit: document.getElementById('s-summary-profit'),
+            };
+            const sTableBodies = {
+                buy: document.getElementById('s-buy-table-body'),
+                avg: document.getElementById('s-avg-price-table-body'),
+                sell: document.getElementById('s-sell-target-table-body'),
+            };
+            const sDownloadBtn = document.getElementById('s-download-btn');
+            const sDownloadImageBtn = document.getElementById('s-download-image-btn');
+            const modalDistribution = [0.10, 0.20, 0.20, 0.20, 0.30];
+            const priceDropPercentages = [0, 0.03, 0.12, 0.24, 0.48];
+
+            function calculateAndDisplayStrategy() {
+                const coinName = sInputs.coinName.value || sInputs.coinName.dataset.placeholder;
+                const totalCapital = parseFloat(sInputs.totalCapital.value) || parseFloat(sInputs.totalCapital.dataset.placeholder);
+                const initialPrice = parseFloat(sInputs.currentPrice.value) || parseFloat(sInputs.currentPrice.dataset.placeholder);
+                const targetProfitPercent = (parseFloat(sInputs.targetProfit.value) || parseFloat(sInputs.targetProfit.dataset.placeholder)) / 100;
+                
+                sTableBodies.buy.innerHTML = '';
+                sTableBodies.avg.innerHTML = '';
+                sTableBodies.sell.innerHTML = '';
+
+                if (!totalCapital || !initialPrice || !targetProfitPercent) {
+                    sSummary.title.textContent = 'Masukkan data untuk memulai';
+                    sSummary.capital.textContent = ''; sSummary.price.textContent = ''; sSummary.profit.textContent = '';
+                    return;
+                }
+
+                sSummary.title.textContent = `Strategi Multiple Entery ${coinName}`;
+                sSummary.capital.textContent = `Modal: ${formatCurrency(totalCapital)}`;
+                sSummary.price.textContent = `Harga Awal: ${formatCurrency(initialPrice)}`;
+                sSummary.profit.textContent = `Target: ${sInputs.targetProfit.value || sInputs.targetProfit.dataset.placeholder}%`;
+
+                let cumulativeModalSpent = 0;
+                let cumulativeCoinsBought = 0;
+
+                for (let i = 0; i < 5; i++) {
+                    const buyPrice = initialPrice * (1 - priceDropPercentages[i]);
+                    const modalForThisBuy = totalCapital * modalDistribution[i];
+                    const coinsBoughtThisStage = modalForThisBuy / buyPrice;
+                    
+                    cumulativeModalSpent += modalForThisBuy;
+                    cumulativeCoinsBought += coinsBoughtThisStage;
+                    
+                    const avgPrice = cumulativeModalSpent / cumulativeCoinsBought;
+                    const targetSellPrice = avgPrice * (1 + targetProfitPercent);
+                    const estimatedProfit = cumulativeModalSpent * targetProfitPercent;
+
+                    sTableBodies.buy.innerHTML += `<tr><td>OPB-${i + 1}</td><td class="neon-text-pink">${formatCurrency(buyPrice)}</td><td>${formatCurrency(modalForThisBuy)}</td><td>${formatNumber(coinsBoughtThisStage)}</td></tr>`;
+                    sTableBodies.avg.innerHTML += `<tr><td>Setelah OPB-${i + 1}</td><td class="font-semibold">${formatCurrency(avgPrice)}</td></tr>`;
+                    sTableBodies.sell.innerHTML += `<tr><td>OPS-${i + 1}</td><td class="neon-text-green">${formatCurrency(targetSellPrice)}</td><td>${formatNumber(cumulativeCoinsBought)}</td><td class="neon-text-green">${formatCurrency(estimatedProfit)}</td></tr>`;
+                }
+            }
+            
+            sAllInputs.forEach(input => {
+                const placeholderText = input.dataset.placeholder;
+                input.placeholder = placeholderText;
+
+                input.addEventListener('input', calculateAndDisplayStrategy);
+                input.addEventListener('blur', calculateAndDisplayStrategy);
+            });
+
+            calculateAndDisplayStrategy();
+
+            function downloadCalculatorPdf(elementId, fileNamePrefix) {
+                loader.textContent = 'Membuat PDF...';
+                loader.classList.remove('hidden');
+                const contentToExport = document.getElementById(elementId);
+                const fileName = `${fileNamePrefix}.pdf`;
+
+                if (!contentToExport) {
+                    showError("Konten PDF tidak ditemukan.");
+                    loader.classList.add('hidden');
+                    return;
+                }
+                
+                const buttonContainerToHide = contentToExport.querySelector('#rr-download-container');
+                if (buttonContainerToHide) {
+                    buttonContainerToHide.classList.add('hidden');
+                }
+
+                const isDark = document.documentElement.classList.contains('dark');
+                const bgColor = isDark ? '#0d0221' : '#f4f7f9';
+
+                html2canvas(contentToExport, { 
+                    scale: 2.5, 
+                    useCORS: true, 
+                    backgroundColor: bgColor,
+                    windowWidth: 1440 
+                }).then(canvas => {
+                    const { jsPDF } = window.jspdf;
+                    const f4Width_mm = 210, f4Height_mm = 330, margin_mm = 10;
+                    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [f4Width_mm, f4Height_mm] });
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdfPageWidth = f4Width_mm - (margin_mm * 2);
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
+                    const ratio = pdfPageWidth / canvasWidth;
+                    const totalImgHeightInPdf = canvasHeight * ratio;
+                    
+                    pdf.addImage(imgData, 'PNG', margin_mm, margin_mm, pdfPageWidth, totalImgHeightInPdf);
+                    
+                    pdf.save(fileName);
+                }).catch(err => {
+                    console.error("PDF generation error:", err);
+                    showError("Gagal membuat PDF.");
+                }).finally(() => {
+                    if (buttonContainerToHide) {
+                        buttonContainerToHide.classList.remove('hidden');
+                    }
+                    loader.classList.add('hidden');
+                });
+            }
+            
+            function downloadCalculatorImage(elementId, fileNamePrefix) {
+                loader.textContent = 'Membuat Gambar...';
+                loader.classList.remove('hidden');
+                const contentToExport = document.getElementById(elementId);
+                const fileName = `${fileNamePrefix}.png`;
+
+                if (!contentToExport) {
+                    showError("Konten untuk gambar tidak ditemukan.");
+                    loader.classList.add('hidden');
+                    return;
+                }
+                
+                const buttonContainerToHide = contentToExport.querySelector('#rr-download-container');
+                if (buttonContainerToHide) {
+                    buttonContainerToHide.classList.add('hidden');
+                }
+
+                const isDark = document.documentElement.classList.contains('dark');
+                const bgColor = isDark ? '#0d0221' : '#f4f7f9';
+
+                html2canvas(contentToExport, { 
+                    scale: 4, 
+                    useCORS: true, 
+                    backgroundColor: bgColor,
+                    windowWidth: 1440 
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = fileName;
+                    link.href = canvas.toDataURL('image/png');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }).catch(err => {
+                    console.error("Image generation error:", err);
+                    showError("Gagal membuat gambar.");
+                }).finally(() => {
+                    if (buttonContainerToHide) {
+                        buttonContainerToHide.classList.remove('hidden');
+                    }
+                    loader.textContent = 'Membuat PDF...';
+                    loader.classList.add('hidden');
+                });
+            }
+
+            rrDownloadBtn.addEventListener('click', () => {
+                const coinName = rrInputs.coinName.value || 'Koin';
+                downloadCalculatorPdf('rr-pdf-content', `uranusfazry_Srategi-One-Entery-Risk-Reward-Trading-${coinName.replace(/\s+/g, '-')}`);
+            });
+            sDownloadBtn.addEventListener('click', () => {
+                const coinName = sInputs.coinName.value || sInputs.coinName.dataset.placeholder;
+                downloadCalculatorPdf('s-pdf-content-wrapper', `uranusfazry_Strategi-Multiple-Entery-Trading-${coinName.replace(/\s+/g, '-')}`);
+            });
+
+            rrDownloadImageBtn.addEventListener('click', () => {
+                const coinName = rrInputs.coinName.value || 'Koin';
+                downloadCalculatorImage('rr-pdf-content', `uranusfazry_Srategi-One-Entery-Risk-Reward-Trading-${coinName.replace(/\s+/g, '-')}`);
+            });
+            sDownloadImageBtn.addEventListener('click', () => {
+                const coinName = sInputs.coinName.value || sInputs.coinName.dataset.placeholder;
+                downloadCalculatorImage('s-pdf-content-wrapper', `uranusfazry_Strategi-Multiple-Entery-Trading-${coinName.replace(/\s+/g, '-')}`);
+            });
+        })();
+    });
+    </script>
+    
+    <!-- Skrip untuk Watermark -->
+    <script>
+      (function() {
+        function initializeWatermark() {
+            const watermarkHTML = `
+              <div id="futuristic-watermark" title="Design by ©URANUSFAZRY">
+                <canvas id="particle-canvas"></canvas>
+                <div class="f-content-wrapper">
+                  <div id="f-main-content" class="f-content">
+                    <div class="f-logo-container">
+                      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M20 20 L80 20 L80 80 L20 80 Z" stroke-opacity="0.5"/>
+                          <path d="M50 5 L95 50 L50 95 L5 50 Z"/>
+                      </svg>
+                    </div>
+                    <span id="f-watermark-text">©URANUSFAZRY</span>
+                  </div>
+                  <div id="f-follow-content" class="f-content hidden">
+                      <span id="f-follow-message"></span>
+                  </div>
+                </div>
+              </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', watermarkHTML);
+
+            const watermarkEl = document.getElementById('futuristic-watermark');
+            const textEl = document.getElementById('f-watermark-text');
+            const logoEl = watermarkEl.querySelector('.f-logo-container');
+            const mainContentEl = document.getElementById('f-main-content');
+            const followContentEl = document.getElementById('f-follow-content');
+            const followMessageEl = document.getElementById('f-follow-message');
+            
+            let isAnimating = false;
+            let autoPlayInterval = null;
+            let currentSequence = 0;
+            const sequenceActions = ['scramble', 'logo', 'youtube', 'tiktok', 'reset'];
+
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const resizeCanvas = () => { if (watermarkEl) { canvas.width = watermarkEl.offsetWidth; canvas.height = watermarkEl.offsetHeight; } };
+            
+            class Particle {
+                constructor() { this.reset(); this.baseSpeedX = (Math.random() - 0.5) * 0.5; this.baseSpeedY = (Math.random() - 0.5) * 0.5; this.speedX = this.baseSpeedX; this.speedY = this.baseSpeedY; }
+                update() {
+                    this.x += this.speedX; this.y += this.speedY; this.opacity -= this.fadeSpeed;
+                    if (this.opacity <= 0 || this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) { this.reset(); }
+                }
+                draw() {
+                    const isLight = watermarkEl.classList.contains('light-mode');
+                    const hue = isLight ? 220 : 186;
+                    const lightness = isLight ? 40 : 60;
+                    ctx.globalAlpha = this.opacity;
+                    ctx.fillStyle = `hsl(${hue}, 100%, ${lightness + this.opacity * 40}%)`;
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                }
+                reset() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.opacity = Math.random() * 0.5 + 0.2; this.size = Math.random() * 1.5 + 0.5; this.fadeSpeed = Math.random() * 0.015 + 0.005; }
+            }
+            const animateParticles = () => { if(!ctx) return; ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); ctx.globalAlpha = 1.0; requestAnimationFrame(animateParticles); };
+            
+            const textScramble = (el) => {
+                const originalText = "©URANUSFAZRY";
+                const chars = '!<>*#{}[]'; let frame = 0; isAnimating = true;
+                const interval = setInterval(() => {
+                    el.innerText = originalText.split('').map((char, i) => { const p = (frame - i * 2) / 15; if (p < 0) return ' '; if (p > 1) return char; return chars[Math.floor(Math.random() * chars.length)]; }).join('');
+                    if (frame >= originalText.length * 2 + 15) { clearInterval(interval); el.innerText = originalText; isAnimating = false; } frame++;
+                }, 30);
+            };
+
+            const typewriter = (el, text) => {
+                let i = 0; el.innerHTML = ""; isAnimating = true;
+                const interval = setInterval(() => {
+                    if (i < text.length) { el.innerHTML += text.charAt(i); i++; } 
+                    else { clearInterval(interval); isAnimating = false; }
+                }, 50);
+            };
+
+            const runAutoSequence = () => {
+                if (isAnimating) return;
+                const action = sequenceActions[currentSequence];
+                switch (action) {
+                    case 'scramble': textScramble(textEl); break;
+                    case 'logo':
+                        isAnimating = true;
+                        logoEl.classList.add('reacting');
+                        logoEl.addEventListener('animationend', () => { logoEl.classList.remove('reacting'); isAnimating = false; }, { once: true });
+                        break;
+                    case 'youtube':
+                        isAnimating = true;
+                        mainContentEl.classList.add('hidden');
+                        setTimeout(() => {
+                            followContentEl.classList.remove('hidden');
+                            typewriter(followMessageEl, "Follow uranusfazry YouTube");
+                        }, 400);
+                        break;
+                    case 'tiktok': 
+                        typewriter(followMessageEl, "Follow uranusfazry TikTok"); 
+                        break;
+                    case 'reset':
+                        isAnimating = true;
+                        followContentEl.classList.add('hidden');
+                        setTimeout(() => {
+                            mainContentEl.classList.remove('hidden');
+                            isAnimating = false;
+                        }, 400);
+                        break;
+                }
+                currentSequence = (currentSequence + 1) % sequenceActions.length;
+            };
+
+            const startAutoPlay = () => {
+                if (autoPlayInterval) clearInterval(autoPlayInterval);
+                runAutoSequence();
+                autoPlayInterval = setInterval(runAutoSequence, 3500);
+            };
+            
+            const init = () => {
+                if(!watermarkEl) return;
+                resizeCanvas();
+                for (let i = 0; i < 40; i++) particles.push(new Particle());
+                animateParticles();
+                window.addEventListener('resize', resizeCanvas);
+                startAutoPlay();
+            };
+            init();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeWatermark);
+        } else {
+            initializeWatermark();
+        }
+      })();
+    </script>
+</body>
+</html>
+
